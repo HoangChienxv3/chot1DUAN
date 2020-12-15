@@ -5,9 +5,22 @@
  */
 package qlbancoffe;
 
+import DAO.Duc.DanhMucDaoDuc;
+import DAO.Duc.MonAnDucDao;
+import HanhDong.DUC.HanhDongQLMonDuc;
+import Helper.HanhDong;
+import java.awt.GridBagConstraints;
 import miniForm.HoaDonTT;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import miniForm.MniQLMonAn;
+import miniForm.MonAnBH;
 import miniForm.ThemMonAn;
+import model.DanhMuc;
+import model.MonAn;
 
 /**
  *
@@ -15,11 +28,78 @@ import miniForm.ThemMonAn;
  */
 public class QLMenu extends javax.swing.JPanel {
 
+    DefaultComboBoxModel comBoDanhMuc;
+    DanhMucDaoDuc DMDUCDao = new DanhMucDaoDuc();
+    MonAnDucDao MADUCDao = new MonAnDucDao();
+    //
+    List<MonAn> lstMonAn = new ArrayList<>();
+
     /**
      * Creates new form QLMenu
      */
     public QLMenu() {
         initComponents();
+        init();
+    }
+
+    void init() {
+        loadDataToComBoDM();
+        HienMon();
+    }
+
+    //khoi tạo Component
+    public void khoiTaoComponent() {
+       HanhDongQLMonDuc.cbxDanhMuc = cbxDanhMuc;
+       //HanhDongQLMonDuc.btnThemDM
+}
+//load combo danh mục
+public void loadDataToComBoDM() {
+        comBoDanhMuc = (DefaultComboBoxModel) cbxDanhMuc.getModel();
+        DMDUCDao.LoadDataToComBoDanhMuc(comBoDanhMuc);
+    }
+    //
+    //hien mon
+    GridBagConstraints gbc = new GridBagConstraints();
+
+    public void HienMon() {
+        pnMon.removeAll();
+        lstMonAn = null;
+        lstMonAn = MADUCDao.getListMonAn();
+        DanhMuc dm = (DanhMuc) comBoDanhMuc.getElementAt(cbxDanhMuc.getSelectedIndex());
+        gbc.insets = new Insets(20, 20, 20, 20);
+        int x = 0, y = 0;
+        if (dm != null) {
+            for (int i = 0; i < lstMonAn.size(); i++) {
+                MonAn MA = lstMonAn.get(i);
+                gbc.gridx = x;
+                gbc.gridy = y;
+
+                if (dm.getTenDanhMuc().equalsIgnoreCase("Tất cả các món")) {
+                    ++x;
+                    if (x % 5 == 0) {
+                        x = 0;
+                        ++y;
+                    }
+                    MniQLMonAn mni = new MniQLMonAn(MA);
+                    pnMon.add(mni, gbc);
+                } else {
+
+                    if (dm.getMaDanhMuc().equals(MA.getMaDanhMuc())) {
+                        ++x;
+                        if (x % 4 == 0) {
+                            x = 0;
+                            ++y;
+                        }
+                        MniQLMonAn mni = new MniQLMonAn(MA);
+                        pnMon.add(mni, gbc);
+                    }
+                }
+
+                pnMon.validate();
+                pnMon.repaint();
+            }
+        }
+
     }
 
     /**
@@ -32,15 +112,16 @@ public class QLMenu extends javax.swing.JPanel {
     private void initComponents() {
 
         pnQLMenu = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        cbxDanhMuc = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        pnMon = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btnThemDM = new javax.swing.JButton();
+        btnXoaDM = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
-        jButton7 = new javax.swing.JButton();
+        btnXacNhan = new javax.swing.JButton();
         btnThemMon = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1600, 900));
         setMinimumSize(new java.awt.Dimension(1600, 900));
@@ -51,65 +132,66 @@ public class QLMenu extends javax.swing.JPanel {
         pnQLMenu.setMinimumSize(new java.awt.Dimension(1600, 900));
         pnQLMenu.setPreferredSize(new java.awt.Dimension(1600, 900));
 
-        jComboBox1.setBackground(new java.awt.Color(204, 204, 255));
-        jComboBox1.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
-        jComboBox1.setForeground(new java.awt.Color(107, 70, 52));
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Danh mục", "trà sữa", "coffe", "đồ ăn", "đồ uống" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        cbxDanhMuc.setBackground(new java.awt.Color(255, 204, 204));
+        cbxDanhMuc.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
+        cbxDanhMuc.setForeground(new java.awt.Color(107, 70, 52));
+        cbxDanhMuc.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Danh mục", "trà sữa" }));
+        cbxDanhMuc.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cbxDanhMucItemStateChanged(evt);
+            }
+        });
+        cbxDanhMuc.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                cbxDanhMucActionPerformed(evt);
             }
         });
 
         jPanel2.setBackground(new java.awt.Color(212, 181, 152));
+        jPanel2.setLayout(new java.awt.GridLayout());
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 710, Short.MAX_VALUE)
-        );
+        pnMon.setBackground(new java.awt.Color(212, 181, 152));
+        pnMon.setLayout(new java.awt.GridBagLayout());
+        jScrollPane1.setViewportView(pnMon);
+
+        jPanel2.add(jScrollPane1);
 
         jPanel4.setBackground(new java.awt.Color(107, 70, 52));
         jPanel4.setLayout(new java.awt.GridLayout(1, 2, 20, 0));
 
-        jButton4.setBackground(new java.awt.Color(126, 199, 47));
-        jButton4.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton4.setForeground(new java.awt.Color(255, 255, 255));
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/them.png"))); // NOI18N
-        jButton4.setText("Thêm danh mục");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btnThemDM.setBackground(new java.awt.Color(126, 199, 47));
+        btnThemDM.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnThemDM.setForeground(new java.awt.Color(255, 255, 255));
+        btnThemDM.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/them.png"))); // NOI18N
+        btnThemDM.setText("Thêm danh mục");
+        btnThemDM.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btnThemDMActionPerformed(evt);
             }
         });
-        jPanel4.add(jButton4);
+        jPanel4.add(btnThemDM);
 
-        jButton5.setBackground(new java.awt.Color(204, 0, 0));
-        jButton5.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
-        jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/huy.png"))); // NOI18N
-        jButton5.setText("Xóa danh mục");
-        jPanel4.add(jButton5);
+        btnXoaDM.setBackground(new java.awt.Color(204, 0, 0));
+        btnXoaDM.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btnXoaDM.setForeground(new java.awt.Color(255, 255, 255));
+        btnXoaDM.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/huy.png"))); // NOI18N
+        btnXoaDM.setText("Xóa danh mục");
+        jPanel4.add(btnXoaDM);
 
         jPanel5.setBackground(new java.awt.Color(107, 70, 52));
         jPanel5.setLayout(new java.awt.GridLayout(1, 3, 25, 20));
 
-        jButton7.setBackground(new java.awt.Color(29, 120, 115));
-        jButton7.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jButton7.setForeground(new java.awt.Color(255, 255, 255));
-        jButton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/dangNhap.png"))); // NOI18N
-        jButton7.setText("Xác nhận");
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
+        btnXacNhan.setBackground(new java.awt.Color(29, 120, 115));
+        btnXacNhan.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        btnXacNhan.setForeground(new java.awt.Color(255, 255, 255));
+        btnXacNhan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/dangNhap.png"))); // NOI18N
+        btnXacNhan.setText("Xác nhận");
+        btnXacNhan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
+                btnXacNhanActionPerformed(evt);
             }
         });
-        jPanel5.add(jButton7);
+        jPanel5.add(btnXacNhan);
 
         btnThemMon.setBackground(new java.awt.Color(126, 199, 47));
         btnThemMon.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -119,13 +201,6 @@ public class QLMenu extends javax.swing.JPanel {
         btnThemMon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnThemMonActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/loadLai.png"))); // NOI18N
-        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel1MouseClicked(evt);
             }
         });
 
@@ -139,7 +214,7 @@ public class QLMenu extends javax.swing.JPanel {
                         .addGap(10, 10, 10)
                         .addGroup(pnQLMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnQLMenuLayout.createSequentialGroup()
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cbxDanhMuc, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(89, 89, 89)
                                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 489, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 700, Short.MAX_VALUE))
@@ -147,8 +222,6 @@ public class QLMenu extends javax.swing.JPanel {
                     .addGroup(pnQLMenuLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(btnThemMon, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -158,30 +231,29 @@ public class QLMenu extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnQLMenuLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addGroup(pnQLMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jComboBox1)
+                    .addComponent(cbxDanhMuc)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(10, 10, 10)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 710, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(pnQLMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnThemMon, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnThemMon, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         add(pnQLMenu);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void cbxDanhMucActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxDanhMucActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_cbxDanhMucActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void btnThemDMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemDMActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_btnThemDMActionPerformed
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    private void btnXacNhanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXacNhanActionPerformed
         // TODO add your handling code here:
         ManHinhBatDau bt = new ManHinhBatDau();
         GridLayout grl = new GridLayout();
@@ -190,7 +262,7 @@ public class QLMenu extends javax.swing.JPanel {
         pnQLMenu.add(bt);
         pnQLMenu.validate();
         pnQLMenu.repaint();
-    }//GEN-LAST:event_jButton7ActionPerformed
+    }//GEN-LAST:event_btnXacNhanActionPerformed
 
     private void btnThemMonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemMonActionPerformed
         // TODO add your handling code here:
@@ -200,23 +272,23 @@ public class QLMenu extends javax.swing.JPanel {
 
     }//GEN-LAST:event_btnThemMonActionPerformed
 
-    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
+    private void cbxDanhMucItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxDanhMucItemStateChanged
         // TODO add your handling code here:
-        btnThemMon.setEnabled(true);
-
-    }//GEN-LAST:event_jLabel1MouseClicked
+        HienMon();
+    }//GEN-LAST:event_cbxDanhMucItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnThemDM;
     private javax.swing.JButton btnThemMon;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton btnXacNhan;
+    private javax.swing.JButton btnXoaDM;
+    private javax.swing.JComboBox<String> cbxDanhMuc;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel pnMon;
     private javax.swing.JPanel pnQLMenu;
     // End of variables declaration//GEN-END:variables
 }

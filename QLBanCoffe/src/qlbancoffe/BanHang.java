@@ -82,6 +82,7 @@ public class BanHang extends javax.swing.JPanel {
     }
 
     void init() {
+        SKDAO.updateSukienAn();
         khoitaoCompomen();
         modeTableBH = (DefaultTableModel) tblBanHang.getModel();
         modeTableBH.setRowCount(0);

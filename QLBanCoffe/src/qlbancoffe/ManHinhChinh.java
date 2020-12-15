@@ -69,6 +69,13 @@ public class ManHinhChinh extends javax.swing.JFrame {
         pnHome.validate();
         pnHome.repaint();
     }
+    void OpenSuKien() {
+        SuKienBH bh = new SuKienBH();
+        pnHome.removeAll();
+        pnHome.add(bh);
+        pnHome.validate();
+        pnHome.repaint();
+    }
 
     void OpenHoaDon() {
         HoaDon hd = new HoaDon();
@@ -143,6 +150,7 @@ public class ManHinhChinh extends javax.swing.JFrame {
         mniQLMenu = new javax.swing.JMenuItem();
         mniQLHoaDon = new javax.swing.JMenuItem();
         mniQLThongKe = new javax.swing.JMenuItem();
+        mniQLThongKe1 = new javax.swing.JMenuItem();
         mniQLTaiKhoan = new javax.swing.JMenuItem();
         mniChuyeTaiKhoan = new javax.swing.JMenuItem();
         mniThoat = new javax.swing.JMenuItem();
@@ -236,6 +244,16 @@ public class ManHinhChinh extends javax.swing.JFrame {
             }
         });
         mnHeThong.add(mniQLThongKe);
+
+        mniQLThongKe1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        mniQLThongKe1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/thongKe.png"))); // NOI18N
+        mniQLThongKe1.setText("Sự kiện");
+        mniQLThongKe1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mniQLThongKe1ActionPerformed(evt);
+            }
+        });
+        mnHeThong.add(mniQLThongKe1);
 
         mniQLTaiKhoan.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         mniQLTaiKhoan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/taiKhoan.png"))); // NOI18N
@@ -380,6 +398,11 @@ public class ManHinhChinh extends javax.swing.JFrame {
         OpenDangNhap();
     }//GEN-LAST:event_mniChuyeTaiKhoanActionPerformed
 
+    private void mniQLThongKe1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mniQLThongKe1ActionPerformed
+        // TODO add your handling code here:
+        OpenSuKien();
+    }//GEN-LAST:event_mniQLThongKe1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -429,6 +452,7 @@ public class ManHinhChinh extends javax.swing.JFrame {
     private javax.swing.JMenuItem mniQLMenu;
     private javax.swing.JMenuItem mniQLTaiKhoan;
     private javax.swing.JMenuItem mniQLThongKe;
+    private javax.swing.JMenuItem mniQLThongKe1;
     private javax.swing.JMenuItem mniThoat;
     private javax.swing.JPanel pnHome;
     // End of variables declaration//GEN-END:variables

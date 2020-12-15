@@ -22,6 +22,7 @@ public class SuKien {
     private String tgBatDau;
     private String tgKetThuc;
     private boolean loaiSuKien;
+    private boolean trangThai;
     //
     public SuKien() {
     }
@@ -32,6 +33,7 @@ public class SuKien {
         this.UuDai = UuDai;
         this.tgBatDau = tgBatDau;
         this.tgKetThuc = tgKetThuc;
+        
     }
     //
 
@@ -45,6 +47,14 @@ public class SuKien {
 
     public String getTenSuKien() {
         return TenSuKien;
+    }
+
+    public boolean isTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(boolean trangThai) {
+        this.trangThai = trangThai;
     }
 
     public void setTenSuKien(String TenSuKien) {
