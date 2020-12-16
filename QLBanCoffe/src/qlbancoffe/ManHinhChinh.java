@@ -246,7 +246,7 @@ public class ManHinhChinh extends javax.swing.JFrame {
         mnHeThong.add(mniQLThongKe);
 
         mniQLThongKe1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
-        mniQLThongKe1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/thongKe.png"))); // NOI18N
+        mniQLThongKe1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/gui.png"))); // NOI18N
         mniQLThongKe1.setText("Sự kiện");
         mniQLThongKe1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

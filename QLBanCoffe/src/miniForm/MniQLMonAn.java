@@ -5,8 +5,18 @@
  */
 package miniForm;
 
+import DAO.Duc.DanhMucDaoDuc;
+import DAO.Duc.MonAnDucDao;
+import HanhDong.DUC.HanhDongQLMonDuc;
 import java.awt.Image;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import model.MonAn;
 
 /**
@@ -14,8 +24,12 @@ import model.MonAn;
  * @author CHIEN
  */
 public class MniQLMonAn extends javax.swing.JPanel {
-    
+
     MonAn monAn = new MonAn();
+    String tenFileHinh;
+    //
+    DanhMucDaoDuc DMDUCDao = new DanhMucDaoDuc();
+    MonAnDucDao MADUCDao = new MonAnDucDao();
 
     /**
      * Creates new form MniQLMonAn
@@ -27,10 +41,11 @@ public class MniQLMonAn extends javax.swing.JPanel {
     }
 
     void init() {
+        tenFileHinh = monAn.getHinhAnh();
         ImageIcon img = new ImageIcon("src\\ImageSP\\" + monAn.getHinhAnh());
         Image im = img.getImage();
         ImageIcon icon = new ImageIcon(im.getScaledInstance(300, 200, im.SCALE_SMOOTH));
-        lbAnh.setIcon(icon);
+        lbHinh.setIcon(icon);
         //
         txtTenMon.setText(monAn.getTenMon());
         SpGia.setValue(monAn.getDonGia());
@@ -46,7 +61,7 @@ public class MniQLMonAn extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        lbAnh = new javax.swing.JLabel();
+        lbHinh = new javax.swing.JLabel();
         lbTenMon = new javax.swing.JLabel();
         lbGiaTien = new javax.swing.JLabel();
         txtTenMon = new javax.swing.JTextField();
@@ -57,15 +72,21 @@ public class MniQLMonAn extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(300, 400));
         setMinimumSize(new java.awt.Dimension(300, 400));
         setPreferredSize(new java.awt.Dimension(300, 400));
-        setLayout(new java.awt.GridLayout());
+        setLayout(new java.awt.GridLayout(1, 0));
 
         jPanel1.setBackground(new java.awt.Color(153, 204, 255));
         jPanel1.setMaximumSize(new java.awt.Dimension(300, 400));
         jPanel1.setMinimumSize(new java.awt.Dimension(300, 400));
+        jPanel1.setPreferredSize(new java.awt.Dimension(300, 400));
 
-        lbAnh.setMaximumSize(new java.awt.Dimension(300, 200));
-        lbAnh.setMinimumSize(new java.awt.Dimension(300, 200));
-        lbAnh.setPreferredSize(new java.awt.Dimension(300, 200));
+        lbHinh.setMaximumSize(new java.awt.Dimension(300, 200));
+        lbHinh.setMinimumSize(new java.awt.Dimension(300, 200));
+        lbHinh.setPreferredSize(new java.awt.Dimension(300, 200));
+        lbHinh.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbHinhMouseClicked(evt);
+            }
+        });
 
         lbTenMon.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         lbTenMon.setForeground(new java.awt.Color(255, 255, 255));
@@ -82,11 +103,21 @@ public class MniQLMonAn extends javax.swing.JPanel {
         jButton1.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Xóa");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setBackground(new java.awt.Color(0, 153, 51));
         jButton2.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("Sửa");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         SpGia.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
@@ -95,7 +126,7 @@ public class MniQLMonAn extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addComponent(lbAnh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbHinh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(47, 47, 47))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -119,7 +150,7 @@ public class MniQLMonAn extends javax.swing.JPanel {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(lbAnh, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbHinh, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
                 .addComponent(lbTenMon, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
@@ -137,6 +168,97 @@ public class MniQLMonAn extends javax.swing.JPanel {
 
         add(jPanel1);
     }// </editor-fold>//GEN-END:initComponents
+    public void upHinh(String hinh) {
+        ImageIcon image = new ImageIcon("src\\ImageSP\\" + hinh);
+        Image im = image.getImage();
+        ImageIcon icon = new ImageIcon(im.getScaledInstance(lbHinh.getWidth(), lbHinh.getHeight(), im.SCALE_SMOOTH));
+        lbHinh.setIcon(icon);
+
+    }
+    private void lbHinhMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbHinhMouseClicked
+        // TODO add your handling code here:
+        //tạo một đối tượng jfilechooser
+        JFileChooser fileChon = new JFileChooser();
+        //hiện lên cửa sổ jfilechooes
+        int ketQua = fileChon.showOpenDialog(null);
+        if (ketQua == JFileChooser.APPROVE_OPTION) {
+            //khai báo một biến file để lấy file mình chọn
+            File file = fileChon.getSelectedFile();
+            //khai báo chuỗi lấy toàn bộ đường dẫn khi chọn file
+            String fullPath = file.getAbsolutePath();//lấy đường dẫn tuyệt đối
+            //để lấy đuôi tên hình
+            tenFileHinh = fileChon.getSelectedFile().getName();
+            monAn.setHinhAnh(tenFileHinh);
+            try {
+                //khai báo môt biến kiểu path đẻ lấy đường dẫn
+                //dường dẫn nguồn nơi lấy file
+                Path src = Paths.get(fullPath);
+                //dường dẫn đích
+                Path dich = Paths.get("src\\ImageSP\\" + tenFileHinh);
+                //thực hiện coppy file
+                Files.copy(src, dich, StandardCopyOption.REPLACE_EXISTING);
+
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
+            upHinh(tenFileHinh);
+        }
+
+    }//GEN-LAST:event_lbHinhMouseClicked
+    //
+    //check
+    public boolean check() {
+        Integer d = 0;
+        if (txtTenMon.getText().length() == 0) {
+            JOptionPane.showMessageDialog(this, "Trống tên");
+            ++d;
+        } else {
+            if (!txtTenMon.getText().equals(monAn.getTenMon())) {
+                try {
+                    MonAn Mon = MADUCDao.findMonByTenMon(txtTenMon.getText());
+                    if (Mon != null) {
+                        JOptionPane.showMessageDialog(this, "Trùng tên món");
+                        ++d;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return d == 0 ? true : false;
+    }
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        if (check()) {
+            try {
+                monAn.setTenMon(txtTenMon.getText());
+                Integer gia = (Integer) SpGia.getValue();
+                monAn.setDonGia(gia);
+                MADUCDao.updateMon(monAn);
+                JOptionPane.showMessageDialog(this, "Sửa thành công");
+                HanhDongQLMonDuc.HienMon();
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Nhập lại đơn giá");
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        int chon = JOptionPane.showConfirmDialog(this, "Bạn chắc chắn xóa", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        if (chon == JOptionPane.YES_OPTION) {
+            try {
+                MADUCDao.updateAnMon(monAn);
+                JOptionPane.showMessageDialog(this, "Xóa thành công");
+                HanhDongQLMonDuc.HienMon();
+            } catch (Exception e) {
+                JOptionPane.showConfirmDialog(this, "Xóa lỗi");
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -144,8 +266,8 @@ public class MniQLMonAn extends javax.swing.JPanel {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel lbAnh;
     private javax.swing.JLabel lbGiaTien;
+    private javax.swing.JLabel lbHinh;
     private javax.swing.JLabel lbTenMon;
     private javax.swing.JTextField txtTenMon;
     // End of variables declaration//GEN-END:variables

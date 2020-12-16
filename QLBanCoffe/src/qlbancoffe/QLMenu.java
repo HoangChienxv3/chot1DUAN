@@ -16,6 +16,7 @@ import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import miniForm.MniQLMonAn;
 import miniForm.MonAnBH;
 import miniForm.ThemMonAn;
@@ -43,17 +44,24 @@ public class QLMenu extends javax.swing.JPanel {
     }
 
     void init() {
+        comBoDanhMuc = (DefaultComboBoxModel) cbxDanhMuc.getModel();
         loadDataToComBoDM();
         HienMon();
+        khoiTaoComponent();
     }
 
     //khoi tạo Component
     public void khoiTaoComponent() {
-       HanhDongQLMonDuc.cbxDanhMuc = cbxDanhMuc;
-       //HanhDongQLMonDuc.btnThemDM
-}
-//load combo danh mục
-public void loadDataToComBoDM() {
+        HanhDongQLMonDuc.cbxDanhMuc = cbxDanhMuc;
+        HanhDongQLMonDuc.btnThemDM = btnThemDM;
+        HanhDongQLMonDuc.btnThemMon = btnThemMon;
+        HanhDongQLMonDuc.btnXacNhan = btnXacNhan;
+        HanhDongQLMonDuc.btnXoaDM = btnXoaDM;
+        HanhDongQLMonDuc.pnMon = pnMon;
+    }
+    //load combo danh mục
+
+    public void loadDataToComBoDM() {
         comBoDanhMuc = (DefaultComboBoxModel) cbxDanhMuc.getModel();
         DMDUCDao.LoadDataToComBoDanhMuc(comBoDanhMuc);
     }
@@ -148,7 +156,7 @@ public void loadDataToComBoDM() {
         });
 
         jPanel2.setBackground(new java.awt.Color(212, 181, 152));
-        jPanel2.setLayout(new java.awt.GridLayout());
+        jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
         pnMon.setBackground(new java.awt.Color(212, 181, 152));
         pnMon.setLayout(new java.awt.GridBagLayout());
@@ -176,6 +184,11 @@ public void loadDataToComBoDM() {
         btnXoaDM.setForeground(new java.awt.Color(255, 255, 255));
         btnXoaDM.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/huy.png"))); // NOI18N
         btnXoaDM.setText("Xóa danh mục");
+        btnXoaDM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnXoaDMActionPerformed(evt);
+            }
+        });
         jPanel4.add(btnXoaDM);
 
         jPanel5.setBackground(new java.awt.Color(107, 70, 52));
@@ -251,6 +264,23 @@ public void loadDataToComBoDM() {
 
     private void btnThemDMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemDMActionPerformed
         // TODO add your handling code here:
+        String tenDM = JOptionPane.showInputDialog(this, "Nhập tên danh mục");
+        if (tenDM.length() == 0) {
+            JOptionPane.showMessageDialog(this, "Bạn chưa nhập tên danh mục");
+        } else {
+            if (DMDUCDao.selectListDanhMucTrungTen(tenDM) != null) {
+                JOptionPane.showMessageDialog(this, "Trùng tên danh mục");
+            } else {
+                try {
+                    DMDUCDao.insertDanhMuc(tenDM);
+                    JOptionPane.showMessageDialog(this, "Thêm thành công");
+                    DMDUCDao.LoadDataToComBoDanhMuc(comBoDanhMuc);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Thêm lỗi");
+                }
+            }
+        }
     }//GEN-LAST:event_btnThemDMActionPerformed
 
     private void btnXacNhanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXacNhanActionPerformed
@@ -266,16 +296,36 @@ public void loadDataToComBoDM() {
 
     private void btnThemMonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemMonActionPerformed
         // TODO add your handling code here:
+
         ThemMonAn tm = new ThemMonAn();
         tm.setVisible(true);
-        btnThemMon.setEnabled(false);
 
     }//GEN-LAST:event_btnThemMonActionPerformed
 
     private void cbxDanhMucItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxDanhMucItemStateChanged
         // TODO add your handling code here:
+        DanhMuc dm = (DanhMuc) comBoDanhMuc.getElementAt(cbxDanhMuc.getSelectedIndex());
+        HanhDongQLMonDuc.dm = dm;
         HienMon();
     }//GEN-LAST:event_cbxDanhMucItemStateChanged
+
+    private void btnXoaDMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoaDMActionPerformed
+        // TODO add your handling code here:
+        comBoDanhMuc = (DefaultComboBoxModel) cbxDanhMuc.getModel();
+        DanhMuc DM = (DanhMuc) comBoDanhMuc.getElementAt(cbxDanhMuc.getSelectedIndex());
+        if (MADUCDao.findMonByMaDM(DM.getMaDanhMuc()) != null) {
+            JOptionPane.showMessageDialog(this, "Danh mục đang còn món không thể xóa");
+        } else {
+            try {
+                DMDUCDao.updateDanhMucVeAn(DM.getMaDanhMuc());
+                JOptionPane.showMessageDialog(this, "Xóa thành công");
+                DMDUCDao.LoadDataToComBoDanhMuc(comBoDanhMuc);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Lỗi xóa");
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_btnXoaDMActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

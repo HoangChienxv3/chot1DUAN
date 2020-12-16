@@ -5,10 +5,26 @@
  */
 package qlbancoffe;
 
+import DAO.An.BanDaoAn;
+import DAO.An.KhuVucDaoAn;
+import DAO.BanHangDao;
+import Helper.HanhDong;
+import Helper.shareHelper;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import miniForm.ThemBan1;
 import miniForm.ThemBan2;
+import model.Ban;
+import model.KhuVuc;
 
 /**
  *
@@ -16,11 +32,130 @@ import miniForm.ThemBan2;
  */
 public class QLKhuVuc extends javax.swing.JPanel {
 
+    DefaultComboBoxModel comBoMode;
+    List<Ban> lstBan = new ArrayList<>();
+    //BanHangDao BHDao = new BanHangDao();
+    KhuVucDaoAn KVDAOAN = new KhuVucDaoAn();
+    BanDaoAn BANDAOAN = new BanDaoAn();
+
     /**
      * Creates new form QLKhuVuc
      */
     public QLKhuVuc() {
         initComponents();
+        init();
+    }
+
+    void init() {
+        comBoMode = (DefaultComboBoxModel) cbxKhuVuc.getModel();
+        loadDataToComBoKV();
+        loadDataToListBan();
+        LoadBanToPanel();
+    }
+
+    //
+    //load comboban
+    public void loadDataToComBoKV() {
+        comBoMode = (DefaultComboBoxModel) cbxKhuVuc.getModel();
+        KVDAOAN.loadDataToComBoKhuVuc(comBoMode);
+    }
+
+    //tải danh sách bàn
+    public void loadDataToListBan() {
+        lstBan.removeAll(lstBan);
+        lstBan = BANDAOAN.selectListBan();
+    }
+    //hiện bàn
+    GridBagConstraints gbcBan = new GridBagConstraints();
+
+    public void LoadBanToPanel() {
+        gbcBan.insets = new Insets(10, 10, 10, 10);
+        int x = 0, y = 0;
+        pnBanQL.removeAll();
+        //
+        KhuVuc kv = (KhuVuc) comBoMode.getElementAt(cbxKhuVuc.getSelectedIndex());;
+        //
+        for (int i = 0; i < lstBan.size(); i++) {
+            Ban ban = lstBan.get(i);
+
+            Integer makv = ban.getMaKhuVuc();
+
+            if (kv != null) {
+                if (makv.equals(kv.getMaKhuVuc())) {
+
+                    gbcBan.gridx = x;
+                    gbcBan.gridy = y;
+                    ++x;
+                    if (x % 14 == 0) {
+                        x = 0;
+                        ++y;
+                    }
+                    pnBanQL.add(taoBan(ban), gbcBan);
+                }
+            }
+        }
+        pnBanQL.validate();
+        pnBanQL.repaint();
+    }
+
+    //tạo button ban
+    public JButton taoBan(Ban ban) {
+        JButton btBan = new JButton();
+        btBan.setText(ban.getTenBan());
+        btBan.setPreferredSize(new Dimension(100, 100));
+        btBan.setIcon(shareHelper.getIcon());
+        btBan.setBackground(Color.white);
+        btBan.setVerticalTextPosition(JLabel.BOTTOM);
+        btBan.setHorizontalTextPosition(JLabel.CENTER);
+        if (ban.isTrangThai()) {
+            btBan.setBackground(Color.red);
+        } else {
+            btBan.setBackground(Color.white);
+        }
+        //xử lý sự kiện
+        btBan.addActionListener((ae) -> {
+
+            lbTenBan.setText(btBan.getText());
+            KhuVuc kv = (KhuVuc) comBoMode.getElementAt(cbxKhuVuc.getSelectedIndex());;
+            if (!ban.isTrangThai()) {
+                Object LuaChon[] = {"Xóa bàn", "Sửa bàn"};
+                int Kq = JOptionPane.showOptionDialog(this, "Mời Bạn Chọn",
+                        "Thao tác",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        LuaChon, LuaChon[0]);
+                if (Kq == 0) {
+                    //code xóa
+                    Integer chon = JOptionPane.showConfirmDialog(this, "Bạn muốn xóa",
+                            "Xác nhận", JOptionPane.YES_NO_OPTION);
+                    if (chon == JOptionPane.YES_OPTION) {
+                        BANDAOAN.updateAn(ban.getMaBan());
+                        JOptionPane.showMessageDialog(this, "Xóa thành công");
+                        loadDataToListBan();
+                        LoadBanToPanel();
+                    }
+                } else if (Kq == 1) {
+                    String tenBan = JOptionPane.showInputDialog(this, "Nhập tên bàn");
+                    //code sửa bàn
+                    if (!ban.getTenBan().equalsIgnoreCase(tenBan)) {
+                        if (BANDAOAN.checkTenBan(tenBan)) {
+                            BANDAOAN.updateTenBan(ban.getMaBan(), ban.getTenBan());
+                            JOptionPane.showMessageDialog(this, "Sửa thành công");
+                            loadDataToComBoKV();
+                            LoadBanToPanel();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Trùng tên bàn");
+
+                        }
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Bàn đang có người ngồi không thể thao tác");
+            }
+            System.out.println(HanhDong.MaHD);
+        });
+        return btBan;
     }
 
     /**
@@ -33,15 +168,17 @@ public class QLKhuVuc extends javax.swing.JPanel {
     private void initComponents() {
 
         pnKhuVuc = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        cbxKhuVuc = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        pnBanQL = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jButton7 = new javax.swing.JButton();
         btnThemBan = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
+        lbTenBan = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(1600, 900));
         setMinimumSize(new java.awt.Dimension(1600, 900));
@@ -54,28 +191,24 @@ public class QLKhuVuc extends javax.swing.JPanel {
         pnKhuVuc.setMinimumSize(new java.awt.Dimension(1600, 900));
         pnKhuVuc.setPreferredSize(new java.awt.Dimension(1600, 900));
 
-        jComboBox1.setBackground(new java.awt.Color(204, 204, 255));
-        jComboBox1.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
-        jComboBox1.setForeground(new java.awt.Color(107, 70, 52));
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Khu vực", "tầng 1", "tầng 2", "sân thượng" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+        cbxKhuVuc.setBackground(new java.awt.Color(204, 204, 255));
+        cbxKhuVuc.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
+        cbxKhuVuc.setForeground(new java.awt.Color(107, 70, 52));
+        cbxKhuVuc.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Khu vực", "tầng 1", "tầng 2", "sân thượng" }));
+        cbxKhuVuc.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cbxKhuVucItemStateChanged(evt);
             }
         });
 
         jPanel2.setBackground(new java.awt.Color(212, 181, 152));
+        jPanel2.setLayout(new java.awt.GridLayout());
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 710, Short.MAX_VALUE)
-        );
+        pnBanQL.setBackground(new java.awt.Color(212, 181, 152));
+        pnBanQL.setLayout(new java.awt.GridBagLayout());
+        jScrollPane1.setViewportView(pnBanQL);
+
+        jPanel2.add(jScrollPane1);
 
         jPanel4.setBackground(new java.awt.Color(107, 70, 52));
         jPanel4.setLayout(new java.awt.GridLayout(1, 2, 20, 0));
@@ -97,6 +230,11 @@ public class QLKhuVuc extends javax.swing.JPanel {
         jButton5.setForeground(new java.awt.Color(255, 255, 255));
         jButton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/huy.png"))); // NOI18N
         jButton5.setText("Xóa khu vực");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
         jPanel4.add(jButton5);
 
         jPanel5.setBackground(new java.awt.Color(107, 70, 52));
@@ -125,12 +263,8 @@ public class QLKhuVuc extends javax.swing.JPanel {
             }
         });
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Icon/loadLai.png"))); // NOI18N
-        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel2MouseClicked(evt);
-            }
-        });
+        lbTenBan.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        lbTenBan.setForeground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout pnKhuVucLayout = new javax.swing.GroupLayout(pnKhuVuc);
         pnKhuVuc.setLayout(pnKhuVucLayout);
@@ -142,16 +276,16 @@ public class QLKhuVuc extends javax.swing.JPanel {
                         .addGap(10, 10, 10)
                         .addGroup(pnKhuVucLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnKhuVucLayout.createSequentialGroup()
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cbxKhuVuc, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(89, 89, 89)
                                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 746, Short.MAX_VALUE))
+                                .addGap(30, 30, 30)
+                                .addComponent(lbTenBan, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(pnKhuVucLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(btnThemBan, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -159,31 +293,43 @@ public class QLKhuVuc extends javax.swing.JPanel {
         pnKhuVucLayout.setVerticalGroup(
             pnKhuVucLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnKhuVucLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
+                .addContainerGap()
                 .addGroup(pnKhuVucLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbxKhuVuc, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbTenBan, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(pnKhuVucLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnThemBan, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnThemBan, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
         add(pnKhuVuc);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
-
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
         String khuVuc = JOptionPane.showInputDialog(this, "Tên khu vực");
-        
+        if (khuVuc.length() == 0) {
+            JOptionPane.showMessageDialog(this, "Bạn chưa nhập");
+        } else {
+            if (KVDAOAN.checkTenKV(khuVuc)) {
+                try {
+                    KVDAOAN.insertKhuVuc(khuVuc);
+                    JOptionPane.showMessageDialog(this, "Thêm thành công");
+                    loadDataToComBoKV();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Lỗi thêm");
+                    e.printStackTrace();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Tên khuc vực trùng");
+            }
+        }
+
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
@@ -216,23 +362,47 @@ public class QLKhuVuc extends javax.swing.JPanel {
         btnThemBan.setEnabled(false);
     }//GEN-LAST:event_btnThemBanActionPerformed
 
-    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+    private void cbxKhuVucItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxKhuVucItemStateChanged
         // TODO add your handling code here:
-        btnThemBan.setEnabled(true);
+        LoadBanToPanel();
+    }//GEN-LAST:event_cbxKhuVucItemStateChanged
 
-    }//GEN-LAST:event_jLabel2MouseClicked
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        comBoMode = (DefaultComboBoxModel) cbxKhuVuc.getModel();
+        KhuVuc KV = (KhuVuc) comBoMode.getElementAt(cbxKhuVuc.getSelectedIndex());
+        if (BANDAOAN.selectListKhucVuc(KV.getMaKhuVuc()).size() > 0) {
+            JOptionPane.showMessageDialog(this, "Khu vực đang còn bàn không thể xóa");
+        } else {
+            int chon = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa " + KV.getTenKhuVuc(),
+                    "Xác nhận", JOptionPane.YES_NO_OPTION);
+            if (chon == JOptionPane.YES_OPTION) {
+                try {
+                    KVDAOAN.updateAn(KV.getMaKhuVuc());
+                    JOptionPane.showMessageDialog(this, "Xóa thành công");
+                    loadDataToComBoKV();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Lỗi xóa");
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    }//GEN-LAST:event_jButton5ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnThemBan;
+    private javax.swing.JComboBox<String> cbxKhuVuc;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton7;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbTenBan;
+    private javax.swing.JPanel pnBanQL;
     private javax.swing.JPanel pnKhuVuc;
     // End of variables declaration//GEN-END:variables
 }

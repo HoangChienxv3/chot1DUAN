@@ -34,11 +34,11 @@ public class HanhDongQLMonDuc {
     //
     public static JPanel pnMon;
     //
-    DefaultComboBoxModel comBoDanhMuc;
-    DanhMucDaoDuc DMDUCDao = new DanhMucDaoDuc();
-    MonAnDucDao MADUCDao = new MonAnDucDao();
+    public static DefaultComboBoxModel comBoDanhMuc;
+    public static DanhMucDaoDuc DMDUCDao = new DanhMucDaoDuc();
+    public static MonAnDucDao MADUCDao = new MonAnDucDao();
     //
-    List<MonAn> lstMonAn = new ArrayList<>();
+    public static List<MonAn> lstMonAn = new ArrayList<>();
     //
     //load combo danh mục
     public void loadDataToComBoDM() {
@@ -47,13 +47,13 @@ public class HanhDongQLMonDuc {
     }
     //
     //hien mon
-    GridBagConstraints gbc = new GridBagConstraints();
-
-    public void HienMon() {
+    public static GridBagConstraints gbc = new GridBagConstraints();
+    public static DanhMuc dm = new DanhMuc();
+    public static void HienMon() {
         pnMon.removeAll();
         lstMonAn = null;
         lstMonAn = MADUCDao.getListMonAn();
-        DanhMuc dm = (DanhMuc) comBoDanhMuc.getElementAt(cbxDanhMuc.getSelectedIndex());
+       // DanhMuc dm = (DanhMuc) comBoDanhMuc.getElementAt(cbxDanhMuc.getSelectedIndex());
         gbc.insets = new Insets(20, 20, 20, 20);
         int x = 0, y = 0;
         if (dm != null) {

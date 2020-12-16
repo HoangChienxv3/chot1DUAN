@@ -18,6 +18,7 @@ import model.DanhMuc;
  * @author CHIEN
  */
 public class DanhMucDaoDuc {
+
     public DanhMuc readDanhMucFromResultSet(ResultSet rs) throws SQLException {
         DanhMuc mode = new DanhMuc();
         mode.setMaDanhMuc(rs.getInt(1));
@@ -25,7 +26,8 @@ public class DanhMucDaoDuc {
 
         return mode;
     }
-     //lấy list danh sách danh mục
+    //lấy list danh sách danh mục
+
     public List<DanhMuc> selectDanhMuc(String sql, Object... args) {
         List<DanhMuc> danhMuc = new ArrayList<>();
         try {
@@ -45,6 +47,7 @@ public class DanhMucDaoDuc {
         }
         return danhMuc;
     }
+
     //truy vấn danh sách danh mục
     public List<DanhMuc> selectListDanhMuc() {
         String sql = "select * from DanhMuc\n"
@@ -63,5 +66,39 @@ public class DanhMucDaoDuc {
             DanhMuc dm = danhMuc.get(i);
             cbx.addElement(dm);
         }
+    }
+    //load danh mục vào combo2
+    public void LoadDataToComBoDanhMuc2(DefaultComboBoxModel cbx) {
+        cbx.removeAllElements();
+//        DanhMuc DMT = new DanhMuc();
+//        DMT.setTenDanhMuc("Tất cả các món");
+//        cbx.addElement(DMT);
+        List<DanhMuc> danhMuc = selectListDanhMuc();
+        for (int i = 0; i < danhMuc.size(); i++) {
+            DanhMuc dm = danhMuc.get(i);
+            cbx.addElement(dm);
+        }
+    }
+
+    //thêm danh mục
+    public void insertDanhMuc(String tenDM) {
+        String sql = "insert into DanhMuc values(?,1)";
+        jdbcHelper.executeUpdate(sql, tenDM);
+    }
+
+    //truy vấn danh sách danh mục theo tên check trùng tên
+    public DanhMuc selectListDanhMucTrungTen(String tenDanhMuc) {
+        String sql = "select * from DanhMuc\n"
+                + "where TrangThaiHD = 1 and TenDanhMuc = ?";
+        List<DanhMuc> dm = selectDanhMuc(sql, tenDanhMuc);
+        return dm.size() > 0 ? dm.get(0) : null;
+    }
+
+    //update danh mục về không hoạt động
+    public void updateDanhMucVeAn(Integer maDM) {
+        String sql = "update DanhMuc\n"
+                + "set TrangThaiHD = 0\n"
+                + "where MaDanhMuc = ?";
+        jdbcHelper.executeUpdate(sql, maDM);
     }
 }

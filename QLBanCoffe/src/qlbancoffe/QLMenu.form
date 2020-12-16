@@ -196,6 +196,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="X&#xf3;a danh m&#x1ee5;c"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnXoaDMActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

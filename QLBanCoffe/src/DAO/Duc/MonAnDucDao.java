@@ -23,7 +23,7 @@ import model.MonAn;
  */
 public class MonAnDucDao {
 
-    private MonAn readFromResultSet(ResultSet rs) throws SQLException {
+    private static MonAn readFromResultSet(ResultSet rs) throws SQLException {
         MonAn model = new MonAn();
         model.setMaMon(rs.getInt("MaMon"));
         model.setTenMon(rs.getString("TenMon"));
@@ -35,7 +35,7 @@ public class MonAnDucDao {
 
     }
 
-    public List<MonAn> select(String sql, Object... args) {
+    public static List<MonAn> select(String sql, Object... args) {
         List<MonAn> list = new ArrayList<>();
         try {
             ResultSet rs = null;
@@ -55,14 +55,12 @@ public class MonAnDucDao {
     }
 
     //lấy về list món
-    public List<MonAn> getListMonAn() {
+    public static List<MonAn> getListMonAn() {
         String sql = "select * from MonAn\n"
                 + "where TrangThai=1";
         return select(sql);
 
     }
-
-   
 
     /**
      * Thêm mới thực thể vào CSDL
@@ -81,11 +79,45 @@ public class MonAnDucDao {
 
     }
 
+    //update món ăn
+    public void updateMon(MonAn mon) {
+        String sql = "update MonAn\n"
+                + "set TenMon = ?,\n"
+                + "	DonGia = ?,\n"
+                + "	HinhAnh = ?\n"
+                + "where MaMon = ?";
+        jdbcHelper.executeUpdate(sql, mon.getTenMon(), mon.getDonGia(), mon.getHinhAnh(), mon.getMaMon());
+    }
+
+    //update ẩn món ăn
+    public void updateAnMon(MonAn mon) {
+        String sql = "update MonAn\n"
+                + "set TrangThai = 0\n"
+                + "where MaMon = ?";
+        jdbcHelper.executeUpdate(sql, mon.getMaMon());
+    }
+
     //
     public MonAn findByMaMon(Integer maMon) {
         String sql = "select * from MonAn\n"
                 + "where TrangThai = 1 and MaMon = ?";
         List<MonAn> list = select(sql, maMon);
+        return list.size() > 0 ? list.get(0) : null;
+    }
+
+    //
+    public MonAn findMonByMaDM(Integer maDM) {
+        String sql = "select * from MonAn\n"
+                + "where TrangThai = 1 and MaDanhMuc = ?";
+        List<MonAn> list = select(sql, maDM);
+        return list.size() > 0 ? list.get(0) : null;
+    }
+    //tim để check trùng với tên món
+
+    public MonAn findMonByTenMon(String TenMon) {
+        String sql = "select * from MonAn\n"
+                + "where TrangThai = 1 and TenMon = ?";
+        List<MonAn> list = select(sql, TenMon);
         return list.size() > 0 ? list.get(0) : null;
     }
 //    public TaiKhoanMode findByTenTaiKhoan(String tenTaiKhoan) {
